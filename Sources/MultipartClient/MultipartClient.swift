@@ -2,14 +2,22 @@ import Foundation
 import OpenAPIRuntime
 import OpenAPIURLSession
 
-struct FileDataResponse: Codable {
-    let name: String
-    let filetype: String
-    let filename: String
-    let filepath: String
-    let timestamp: String
-    let meta: [String: String]
+public struct FileDataResponse: Codable {
+    let name: String?
+    let filetype: String?
+    let filename: String?
+    let filepath: String?
+    let timestamp: Date?
+    let meta: [String: String]?
+    
+    private enum CodingKeys: String, CodingKey {
+        case name, filetype, filename, filepath, timestamp, meta
+    }
 }
+//
+//extension FileDataResponse {
+//    internal init(component: Components.Schemas)
+//}
 
 public struct MultipartClient {
     private let client: Client
@@ -20,7 +28,7 @@ public struct MultipartClient {
         self.client = Client(serverURL: serverURL, transport: URLSessionTransport())
     }
     
-    public func upload(filePath: String) async throws {
+    public func upload(filePath: String) async throws/* -> FileDataResponse */{
         let data = try! Data(contentsOf: URL(filePath: filePath))
         
         let response = try await client.upload(body: .multipartForm([
@@ -33,26 +41,17 @@ public struct MultipartClient {
             ))
             
         ]))
-//        let response = try await client.uploadImage(body: .multipartForm([
-//            .images_lbrack__rbrack_(.init(
-//                payload: .init(body: .init(data)),
-//                /// The filename is meaningless here, but mandatory field to include, without Lemmy rejects the request.
-//                filename: "hello.png"
-//            ))
-//        ]))
-        print(response)
+        let json = try response.ok.body.json
+        
+        
+//
+//        let fileDataResponse: FileDataResponse = FileDataResponse(
+//            name: json.name,
+//            filetype: json.filetype,
+//            filename: json.filename,
+//            filepath: json.filepath,
+//            timestamp: json.timestamp,
+//            meta: json.meta?.additionalProperties)
+//        return fileDataResponse
     }
-    
-//    public func getStatus() async throws -> Operations.getStatus.Output.Ok.Body.jsonPayload {
-//        let response = try await client.getStatus(Operations.getStatus.Input())
-//        switch response {
-//        case .ok(let okResponse):
-//            switch okResponse.body {
-//            case .json(let status):
-//                return status
-//            }
-//        case .undocumented(statusCode: let statusCode, _):
-//            throw NSError(domain: "StatusApiError", code: statusCode, userInfo: [NSLocalizedDescriptionKey: "Received undocumented status code: \(statusCode)"])
-//        }
-//    }
 }

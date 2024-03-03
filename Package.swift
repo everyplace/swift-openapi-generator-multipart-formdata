@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "multipart",
-    platforms: [.macOS(.v10_15), .iOS(.v16), .tvOS(.v13), .visionOS(.v1)],
+    platforms: [.macOS(.v13), .iOS(.v16), .tvOS(.v13), .visionOS(.v1)],
     products: [
         .library(name: "MultipartClient", targets: ["MultipartClient"]),
         .executable(name: "MultipartCli", targets: ["MultipartCli"])
