@@ -10,5 +10,5 @@ import MultipartClient
 
 
 let client = MultipartClient(serverURL: try Servers.server1())
-try await client.upload(filePath: "./test.png")
-print("no")
+let response = try await client.upload(filePath: "./test.png")
+print(response)
