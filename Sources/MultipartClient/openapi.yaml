@@ -1,0 +1,58 @@
+openapi: 3.0.0
+info:
+  title: swift-openapi-generator-multipart-formdata
+  description: A simple service for uploading images with descriptions
+  version: 1.0.0
+servers:
+  - url: https://swift-openapi-generator-multipart-formdata.glitch.me
+paths:
+  /upload:
+    post:
+      summary: Upload an image with a description
+      operationId: upload
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image to upload
+                description:
+                  type: string
+                  description: Description of the file
+              required:
+                - image
+      responses:
+        '200':
+          description: Successfully uploaded the image.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Original name of the uploaded file.
+                  filetype:
+                    type: string
+                    description: File extension of the uploaded image.
+                  filename:
+                    type: string
+                    description: Generated filename for the uploaded image.
+                  filepath:
+                    type: string
+                    description: Relative path to the uploaded image.
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: Timestamp of the file upload.
+                  meta:
+                    type: object
+                    additionalProperties: true
+                    description: Additional metadata provided in the upload form.
+        '400':
+          description: Bad request, e.g., missing image or invalid format
