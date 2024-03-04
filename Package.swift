@@ -14,6 +14,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
     ],
     targets: [
         .target(
@@ -28,7 +29,11 @@ let package = Package(
         ),
         .executableTarget(
             name: "MultipartCli",
-            dependencies: ["MultipartClient"]
+            dependencies: [
+                "MultipartClient",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            ],
+            path: "Sources/MultipartCli"
         )
     ]
 )

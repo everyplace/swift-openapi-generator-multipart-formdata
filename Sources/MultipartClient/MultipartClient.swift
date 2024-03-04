@@ -34,12 +34,12 @@ public struct MultipartClient {
         self.client = Client(serverURL: serverURL, transport: URLSessionTransport())
     }
     
-    public func upload(filePath: String) async throws -> FileDataResponse {
+    public func upload(filePath: String, fileDiscription: String) async throws -> FileDataResponse {
         let data = try! Data(contentsOf: URL(filePath: filePath))
         
         let response = try await client.upload(body: .multipartForm([
             .description(.init(
-                payload: .init(body: "test")
+                payload: .init(body: .init(fileDiscription))
             )),
             .image(.init(
                 payload: .init(body: .init(data)),
@@ -47,8 +47,6 @@ public struct MultipartClient {
             ))            
         ]))
         let fileDataResponse = FileDataResponse(component: try response.ok.body.json)
-        
         return fileDataResponse
-        
     }
 }
