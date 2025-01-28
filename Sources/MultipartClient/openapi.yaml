@@ -42,6 +42,15 @@ components:
       required:
         - image
         
+    MessageDataRequest: #No image, just a description
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the file
+      required:
+        - description
+        
     FileDataResponse:  # Define the FileDataResponse component
       type: object
       properties:
