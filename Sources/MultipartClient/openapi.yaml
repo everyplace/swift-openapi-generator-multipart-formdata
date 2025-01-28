@@ -15,17 +15,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                image:
-                  type: string
-                  format: binary
-                  description: Image to upload
-                description:
-                  type: string
-                  description: Description of the file
-              required:
-                - image
+              $ref: '#/components/schemas/FileDataRequest'
       responses:
         '200':
           description: Successfully uploaded the image.
@@ -39,6 +29,19 @@ paths:
 
 components:
   schemas:
+    FileDataRequest: # The data to send to the server
+      type: object
+      properties:
+        image:
+          type: string
+          format: binary
+          description: Image to upload
+        description:
+          type: string
+          description: Description of the file
+      required:
+        - image
+        
     FileDataResponse:  # Define the FileDataResponse component
       type: object
       properties:
