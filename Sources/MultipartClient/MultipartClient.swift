@@ -2,6 +2,20 @@ import Foundation
 import OpenAPIRuntime
 import OpenAPIURLSession
 
+public struct FileDataRequest: Codable {
+    let image: Data
+    let description: String?
+    
+    public init(image: Data, description: String? = nil) {
+        self.image = image
+        self.description = description
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case image, description
+    }
+}
+
 public struct FileDataResponse: Codable {
     let name: String?
     let filetype: String?
@@ -27,6 +41,36 @@ extension FileDataResponse {
     }
 }
 
+extension FileDataRequest {
+    /// Convert our domain type into the generated multipart enum array.
+    func toMultipart() -> MultipartBody<Components.Schemas.FileDataRequest> {
+        var parts: [Components.Schemas.FileDataRequest] = []
+        
+        // If we have a description, add a `.description` part:
+        if let description = description {
+            parts.append(
+                .description(
+                    .init(payload: .init(body: .init(description)))
+                )
+            )
+        }
+        
+        // Always add the image as an `.image` part:
+        parts.append(
+            .image(
+                .init(
+                    payload: .init(body: .init(image)),
+                    filename: "test.png"      // optional
+                    // contentType: "image/png"  // if needed
+                )
+            )
+        )
+        let multipartBody:MultipartBody = MultipartBody<Components.Schemas.FileDataRequest>(parts)
+
+        return multipartBody
+    }
+}
+
 public struct MultipartClient {
     private let client: Client
          
@@ -37,15 +81,9 @@ public struct MultipartClient {
     public func upload(filePath: String, fileDiscription: String) async throws -> FileDataResponse {
         let data = try! Data(contentsOf: URL(filePath: filePath))
         
-        let response = try await client.upload(body: .multipartForm([
-            .description(.init(
-                payload: .init(body: .init(fileDiscription))
-            )),
-            .image(.init(
-                payload: .init(body: .init(data)),
-                filename: "test.png"
-            ))            
-        ]))
+        let dataRequest: FileDataRequest = FileDataRequest(image: data, description: fileDiscription)
+        
+        let response = try await client.upload(body: .multipartForm(dataRequest.toMultipart()))
         let fileDataResponse = FileDataResponse(component: try response.ok.body.json)
         return fileDataResponse
     }
