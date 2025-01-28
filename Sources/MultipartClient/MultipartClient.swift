@@ -16,6 +16,19 @@ public struct FileDataRequest: Codable {
     }
 }
 
+public struct MessageDataRequest: Codable {
+    
+    let description: String
+    
+    public init(description: String) {
+        self.description = description
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case description
+    }
+}
+
 public struct FileDataResponse: Codable {
     let name: String?
     let filetype: String?
@@ -71,6 +84,22 @@ extension FileDataRequest {
     }
 }
 
+extension MessageDataRequest {
+    /// Convert our domain type into the generated multipart enum array.
+    func toMultipart() -> MultipartBody<Components.Schemas.MessageDataRequest> {
+
+        //initialize a Components.Schemas.MessageDataRequest from a MessageDataRequest type
+        let messageDataRequest:Components.Schemas.MessageDataRequest = .init(
+            description: description
+        )
+        
+        let parts: [Components.Schemas.MessageDataRequest] = [messageDataRequest]
+        let multipartBody:MultipartBody = MultipartBody<Components.Schemas.MessageDataRequest>(parts)
+        
+        return multipartBody
+    }
+}
+
 public struct MultipartClient {
     private let client: Client
          
@@ -82,7 +111,7 @@ public struct MultipartClient {
         let data = try! Data(contentsOf: URL(filePath: filePath))
         
         let dataRequest: FileDataRequest = FileDataRequest(image: data, description: fileDiscription)
-        
+
         let response = try await client.upload(body: .multipartForm(dataRequest.toMultipart()))
         let fileDataResponse = FileDataResponse(component: try response.ok.body.json)
         return fileDataResponse
